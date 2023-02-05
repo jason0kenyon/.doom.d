@@ -243,11 +243,6 @@ A pretty graph of your org-roam notes.
           org-roam-ui-open-on-start t)
 #+end_src
 * Latex
-** Lsp Mode
-Language server.
-#+begin_src emacs-lisp
-(add-hook 'TeX-mode-hook #'lsp-deferred)
-#+end_src
 ** Company Mode
 Autocomplete menu and prettier code.
 #+begin_src emacs-lisp
@@ -255,7 +250,9 @@ Autocomplete menu and prettier code.
 
 (add-hook 'TeX-mode-hook
           (lambda ()
-            (push '("\\mathbb{C}" . ?ℂ) prettify-symbols-alist)))
+            (push '("\\mathbb{C}" . ?ℂ) prettify-symbols-alist)
+            (push '("\\mathbb{F}" . ?𝔽) prettify-symbols-alist)
+            ))
 (add-hook 'after-init-hook 'global-company-mode)
 
 (add-hook 'company-mode-hook 'company-box-mode)

@@ -57,3 +57,7 @@
 (package! company-box)
 (package! cdlatex)
 (package! mu4e-alert :disable t)
+(unpin! lsp-mode)
+(package! lsp-mode)
+(unpin! lsp-ui)
+(package! lsp-ui)

@@ -209,13 +209,13 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t)
 
-(add-hook 'TeX-mode-hook #'lsp-deferred)
-
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
 (add-hook 'TeX-mode-hook
           (lambda ()
-            (push '("\\mathbb{C}" . ?ℂ) prettify-symbols-alist)))
+            (push '("\\mathbb{C}" . ?ℂ) prettify-symbols-alist)
+            (push '("\\mathbb{F}" . ?𝔽) prettify-symbols-alist)
+            ))
 (add-hook 'after-init-hook 'global-company-mode)
 
 (add-hook 'company-mode-hook 'company-box-mode)
