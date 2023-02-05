@@ -83,13 +83,13 @@
       display-time-default-load-average nil
       doom-modeline-time t)
   )
-  (setq doom-theme 'doom-one)
+  (setq doom-theme 'doom-tokyo-night)
   (setq display-line-numbers-type 'relative)
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
-(setq doom-font (font-spec :family "JetBrainsMono" :weight 'normal :size 40 ))
+(setq doom-font (font-spec :family "Hack" :weight 'normal :size 40 ))
 (setq doom-variable-pitch-font (font-spec :family "Inconsolata" :weight 'Medium :size 50 ))
 
 (add-hook 'org-mode-hook 'variable-pitch-mode)
@@ -209,6 +209,7 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t)
 
+(add-hook 'TeX-mode-hook 'lsp-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
 (add-hook 'TeX-mode-hook
