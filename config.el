@@ -72,14 +72,13 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 (setq display-time-default-load-average nil)
 (add-hook 'after-init-hook 'display-time-mode)
 (after! doom-modeline
-  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode) ; filesize in modeline
-  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)   ; cursor column in modeline
+  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
+  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)
   (line-number-mode -1)
-  (setq doom-modeline-mu4e t
+  (setq
       doom-modeline-height 40
       display-time-default-load-average nil
       doom-modeline-time t)
@@ -94,8 +93,6 @@
 (setq doom-variable-pitch-font (font-spec :family "Inconsolata" :weight 'Medium :size 50 ))
 
 (add-hook 'org-mode-hook 'variable-pitch-mode)
-(map! :leader
-      :desc "Org babel tangle" "m B" #'org-babel-tangle)
 (after! org
   (setq org-ellipsis " ▼"
         org-hide-emphasis-markers t
@@ -135,11 +132,12 @@
         (org-roam-capture-templates (list (append (car org-roam-capture-templates)
                                                   '(:immediate-finish t)))))
     (apply #'org-roam-node-insert args)))
-
 (map!
  :leader
  (:prefix ("n r" . "node roam")
   :desc "quick insert" "i" #'org-roam-node-insert-immediate))
+(map! :leader
+      :desc "Org babel tangle" "m B" #'org-babel-tangle)
 
 (after! org
 (setq org-directory "~/projects/org/"
@@ -247,7 +245,7 @@
 (setq citar-library-paths '("~/library/papers/"))
 (setq citar-symbols
       `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . "🖋️")
         (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
 (setq citar-symbol-separator "  ")
 
@@ -332,19 +330,6 @@ orgtbl syntax."
       :desc "Convert table to matrix" "l" #'lazytab-orgtbl-replace)
 (add-hook 'TeX-mode-hook 'orgtbl-mode)
 
-(defun mu4e-headers-mark-all-unread-read ()
-  "Put a ! \(read) mark on all visible unread messages."
-  (interactive)
-  (mu4e-headers-mark-for-each-if
-   (cons 'read nil)
-   (lambda (msg param)
-     (memq 'unread (mu4e-msg-field msg :flags)))))
-
-(defun mu4e-headers-flag-all-read ()
-  "Flag all visible messages as \"read\"."
-  (interactive)
-  (mu4e-headers-mark-all-unread-read)
-  (mu4e-mark-execute-all t))
 (add-hook 'mu4e-compose-mode-hook 'turn-off-auto-fill)
 (set-email-account! "binghamton"
   '((mu4e-sent-folder       . "/jkenyon3/[Gmail]/Sent Mail")
@@ -363,12 +348,26 @@ orgtbl syntax."
     (user-mail-address      . "jason0kenyon@gmail.com"))
   t)
 (after! mu4e
+
 (setq mu4e-maildir-shortcuts
         '(("/jason0kenyon/Inbox"             . ?i)
           ("/jkenyon3/Inbox"             . ?I)
           ("/jason0kenyon/[Gmail]/Sent Mail" . ?s)
           ("/jkenyon3/[Gmail]/Sent Mail" . ?S)))
 )
-(mu4e t)
+
+(defun mu4e-headers-mark-all-unread-read ()
+  "Put a ! \(read) mark on all visible unread messages."
+  (interactive)
+  (mu4e-headers-mark-for-each-if
+   (cons 'read nil)
+   (lambda (msg param)
+     (memq 'unread (mu4e-msg-field msg :flags)))))
+
+(defun mu4e-headers-flag-all-read ()
+  "Flag all visible messages as \"read\"."
+  (interactive)
+  (mu4e-headers-mark-all-unread-read)
+  (mu4e-mark-execute-all t))
 
 (setq rmh-elfeed-org-files '("~/.doom.d/elfeed.org"))

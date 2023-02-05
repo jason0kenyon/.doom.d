@@ -77,14 +77,13 @@
 * Appearance
 ** Theme
 #+begin_src emacs-lisp
-(add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 (setq display-time-default-load-average nil)
 (add-hook 'after-init-hook 'display-time-mode)
 (after! doom-modeline
-  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode) ; filesize in modeline
-  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)   ; cursor column in modeline
+  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
+  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)
   (line-number-mode -1)
-  (setq doom-modeline-mu4e t
+  (setq
       doom-modeline-height 40
       display-time-default-load-average nil
       doom-modeline-time t)
@@ -107,8 +106,6 @@
 Just make things look good.
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook 'variable-pitch-mode)
-(map! :leader
-      :desc "Org babel tangle" "m B" #'org-babel-tangle)
 (after! org
   (setq org-ellipsis " ▼"
         org-hide-emphasis-markers t
@@ -152,15 +149,17 @@ This function allows you to insert a node in a document that may not yet exist, 
         (org-roam-capture-templates (list (append (car org-roam-capture-templates)
                                                   '(:immediate-finish t)))))
     (apply #'org-roam-node-insert args)))
-
 (map!
  :leader
  (:prefix ("n r" . "node roam")
   :desc "quick insert" "i" #'org-roam-node-insert-immediate))
+(map! :leader
+      :desc "Org babel tangle" "m B" #'org-babel-tangle)
 #+end_src
 *** Templates
+Set org, org-agenda and org-roam directories. My three roam templates for each day and week, along with a template for setting and achieving goals.
 #+begin_src emacs-lisp
-
+(after! org
 (setq org-directory "~/projects/org/"
       org-agenda-files '("~/projects/org/org-roam")
       org-roam-directory "~/projects/org/org-roam")
@@ -186,23 +185,57 @@ This function allows you to insert a node in a document that may not yet exist, 
                  :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Aim\n#+category: Aim")
                  :unnarrowed t)
                 ))
+ )
 #+end_src
 ** Agenda
+My custom agenda view. It displays all current tasks based on priority, a weekly agenda, and the list of all tasks put on hold.
 #+begin_src emacs-lisp
+(after! org-fancy-priorities
+   (setq org-fancy-priorities-list '("⚡" "⚠" "❗")))
 (after! org
-
 (setq
-  org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
+  org-agenda-block-separator ?\u25AA
+  org-todo-keywords
           '((sequence
-             "TODO(t)"           ; A task that is ready to be tackled
-             "WAIT(w)"           ; Something is holding up this task
-             "DONE(d)"           ; Task has been completed
-              )) ; Task has been cancelled
-   org-fancy-priorities-list '("❗" "[B]" "[C]")
-   org-agenda-block-separator 8411)
+             "TODO(t)"
+             "WAIT(w)"
+             "|"
+             "DONE(d)"
+             "CANCELLED(c)"
+             )))
+(setq org-agenda-custom-commands
+      '(("v" "Main"
+        ((tags-todo "+PRIORITY=\"A\""
+        ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))
+         (org-agenda-overriding-header "High Priority Tasks:")))
+        (tags-todo "+PRIORITY=\"B\""
+         ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))
+          (org-agenda-overriding-header "Medium Priority Tasks:")))
+        (tags-todo "+PRIORITY=\"C\""
+        ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))
+        (org-agenda-overriding-header "Low Priority Tasks:")))
+        (agenda "")
+        (todo "WAIT"
+        ((org-agenda-overriding-header "On Hold:")))
+        )
+        )
+        ("l" "Waitlist"
+         ((todo "WAIT"
+        ((org-agenda-overriding-header "On Hold:"))))
+        )
+        )
 )
+)
+
+
+
+
+
+
+
 #+end_src
 ** UI Mode
+A pretty graph of your org-roam notes.
 #+begin_src emacs-lisp
 (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -211,10 +244,12 @@ This function allows you to insert a node in a document that may not yet exist, 
 #+end_src
 * Latex
 ** Lsp Mode
+Language server.
 #+begin_src emacs-lisp
 (add-hook 'TeX-mode-hook #'lsp-deferred)
 #+end_src
 ** Company Mode
+Autocomplete menu and prettier code.
 #+begin_src emacs-lisp
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
@@ -236,6 +271,7 @@ This function allows you to insert a node in a document that may not yet exist, 
 )
 #+end_src
 ** Snippets
+Automatically activating snippets.
 #+begin_src emacs-lisp
 (after! yasnippet
 (defun my-yas-try-expanding-auto-snippets ()
@@ -246,21 +282,24 @@ This function allows you to insert a node in a document that may not yet exist, 
 )
 #+end_src
 ** PDF View
+For looking at papers.
 #+begin_src emacs-lisp
 (add-hook 'doc-view-mode-hook 'pdf-tools-install)
 #+end_src
 ** Citar
+For organizing your references and your thoughts on them.
 #+begin_src emacs-lisp
 (citar-org-roam-mode)
 (setq citar-bibliography "~/projects/templates/refs.bib")
 (setq citar-library-paths '("~/library/papers/"))
 (setq citar-symbols
       `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . "🖋️")
         (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
 (setq citar-symbol-separator "  ")
 #+end_src
 ** Matrices
+For typing matrices much more quickly in latex. (It's even faster than writing them on paper.)
 #+begin_src emacs-lisp
 (require 'cdlatex)
 (require 'org-table)
@@ -345,20 +384,8 @@ orgtbl syntax."
 #+end_src
 * Email
 ** Config
+Making my two email accounts accessible within emacs.
 #+begin_src emacs-lisp
-(defun mu4e-headers-mark-all-unread-read ()
-  "Put a ! \(read) mark on all visible unread messages."
-  (interactive)
-  (mu4e-headers-mark-for-each-if
-   (cons 'read nil)
-   (lambda (msg param)
-     (memq 'unread (mu4e-msg-field msg :flags)))))
-
-(defun mu4e-headers-flag-all-read ()
-  "Flag all visible messages as \"read\"."
-  (interactive)
-  (mu4e-headers-mark-all-unread-read)
-  (mu4e-mark-execute-all t))
 (add-hook 'mu4e-compose-mode-hook 'turn-off-auto-fill)
 (set-email-account! "binghamton"
   '((mu4e-sent-folder       . "/jkenyon3/[Gmail]/Sent Mail")
@@ -377,20 +404,39 @@ orgtbl syntax."
     (user-mail-address      . "jason0kenyon@gmail.com"))
   t)
 (after! mu4e
+
 (setq mu4e-maildir-shortcuts
         '(("/jason0kenyon/Inbox"             . ?i)
           ("/jkenyon3/Inbox"             . ?I)
           ("/jason0kenyon/[Gmail]/Sent Mail" . ?s)
           ("/jkenyon3/[Gmail]/Sent Mail" . ?S)))
 )
-(mu4e t)
+#+end_src
+** Miscellaneous Functions
+For when you don't want to read your emails.
+#+begin_src emacs-lisp
+(defun mu4e-headers-mark-all-unread-read ()
+  "Put a ! \(read) mark on all visible unread messages."
+  (interactive)
+  (mu4e-headers-mark-for-each-if
+   (cons 'read nil)
+   (lambda (msg param)
+     (memq 'unread (mu4e-msg-field msg :flags)))))
+
+(defun mu4e-headers-flag-all-read ()
+  "Flag all visible messages as \"read\"."
+  (interactive)
+  (mu4e-headers-mark-all-unread-read)
+  (mu4e-mark-execute-all t))
 #+end_src
 ** Mbsync
+My configuration for synchronizing local email directory with the cloud:
 [[file:.mbsyncrc][Local]]
 * Elfeed
 ** Setting Location
 #+begin_src emacs-lisp
 (setq rmh-elfeed-org-files '("~/.doom.d/elfeed.org"))
 #+end_src
-** Check it out
+** My feed
+Here is my rss feed for scanning Arxiv:
 [[file:elfeed.org][Feed]]

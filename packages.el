@@ -56,3 +56,4 @@
 (package! mu4e-alert)
 (package! company-box)
 (package! cdlatex)
+(package! mu4e-alert :disable t)
