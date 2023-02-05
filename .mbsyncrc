@@ -1,0 +1,43 @@
+IMAPAccount gmail
+Host imap.gmail.com
+User jkenyon3@binghamton.edu
+PassCmd "pass jkenyon3@binghamton.edu"
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Subfolders Verbatim
+Path ~/.mail/jkenyon3/
+Inbox ~/.mail/jkenyon3/Inbox
+
+Channel gmail
+Far :gmail-remote:
+Near :gmail-local:
+Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail" "[Gmail]/Trash"
+Create Both
+SyncState *
+
+IMAPAccount personal
+Host imap.gmail.com
+User jason0kenyon@gmail.com
+PassCmd "pass jason0kenyon@gmail.com"
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore personal-remote
+Account personal
+
+MaildirStore personal-local
+Subfolders Verbatim
+Path ~/.mail/jason0kenyon/
+Inbox ~/.mail/jason0kenyon/Inbox
+
+Channel personal
+Far :personal-remote:
+Near :personal-local:
+Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail" "[Gmail]/Trash"
+Create Both
+SyncState *

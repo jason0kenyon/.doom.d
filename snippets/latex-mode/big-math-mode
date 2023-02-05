@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: big-math-mode
+# key: nk
+# condition: 'auto
+# --
+\[
+$0
+\]
