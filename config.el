@@ -141,6 +141,7 @@
  (:prefix ("n r" . "node roam")
   :desc "quick insert" "i" #'org-roam-node-insert-immediate))
 
+(after! org
 (setq org-directory "~/projects/org/"
       org-agenda-files '("~/projects/org/org-roam")
       org-roam-directory "~/projects/org/org-roam")
@@ -166,18 +167,43 @@
                  :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Aim\n#+category: Aim")
                  :unnarrowed t)
                 ))
+ )
 
+(after! org-fancy-priorities
+   (setq org-fancy-priorities-list '("⚡" "⚠" "❗")))
 (after! org
-
 (setq
-  org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
+  org-agenda-block-separator ?\u25AA
+  org-todo-keywords
           '((sequence
-             "TODO(t)"           ; A task that is ready to be tackled
-             "WAIT(w)"           ; Something is holding up this task
-             "DONE(d)"           ; Task has been completed
-              )) ; Task has been cancelled
-   org-fancy-priorities-list '("❗" "[B]" "[C]")
-   org-agenda-block-separator 8411)
+             "TODO(t)"
+             "WAIT(w)"
+             "|"
+             "DONE(d)"
+             "CANCELLED(c)"
+             )))
+(setq org-agenda-custom-commands
+      '(("v" "Main"
+        ((tags-todo "+PRIORITY=\"A\""
+        ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))
+         (org-agenda-overriding-header "High Priority Tasks:")))
+        (tags-todo "+PRIORITY=\"B\""
+         ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))
+          (org-agenda-overriding-header "Medium Priority Tasks:")))
+        (tags-todo "+PRIORITY=\"C\""
+        ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))
+        (org-agenda-overriding-header "Low Priority Tasks:")))
+        (agenda "")
+        (todo "WAIT"
+        ((org-agenda-overriding-header "On Hold:")))
+        )
+        )
+        ("l" "Waitlist"
+         ((todo "WAIT"
+        ((org-agenda-overriding-header "On Hold:"))))
+        )
+        )
+)
 )
 
 (setq org-roam-ui-sync-theme t
