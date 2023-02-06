@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: fraction
-# key: fra
+# name: subscript
+# key: sbs
 # condition: (and (texmathp) 'auto)
 # --
-\frac{${1:a}}{${2:b}}
+_{${1:num}}$0

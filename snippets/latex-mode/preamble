@@ -10,6 +10,7 @@
 \newtheorem{corollary}{Corollary}[section]
 \newtheorem{lemma}{Lemma}[section]
 \newtheorem{proposition}{Proposition}[section]
+\newtheorem{definition}{Definition}[section]
 \begin{document}
 $0
 \end{document}

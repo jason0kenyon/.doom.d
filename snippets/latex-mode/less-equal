@@ -1,0 +1,5 @@
+# key: leq
+# name: less-equal
+# condition: (and (texmathp) 'auto)
+# --
+\leq$0

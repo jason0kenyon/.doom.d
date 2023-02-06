@@ -1,0 +1,5 @@
+# key: tt
+# name: power
+# condition: (and (texmathp) 'auto)
+# --
+^{${1:num}}$0
