@@ -89,42 +89,27 @@
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
-(setq doom-font (font-spec :family "SpaceMono" :weight 'normal :size 40 ))
+(setq doom-font (font-spec :family "JetBrainsMono" :weight 'normal :size 40 ))
 (setq doom-variable-pitch-font (font-spec :family "Vollkorn" :weight 'normal :size 50 ))
 
-(add-hook 'org-mode-hook 'variable-pitch-mode)
 (after! org
   (setq org-ellipsis " ▼"
         org-hide-emphasis-markers t
         org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
         org-superstar-item-bullet-alist '((?+ . ?◆) (?- . ?•))
         org-superstar-special-todo-items 'hide)
-
-  (dolist (face '((org-level-1 . 1.5)
-                  (org-level-2 . 1.25)
-                  (org-level-3 . 1.15)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Vollkorn" :weight 'normal :height (cdr face)))
-
-  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
-
-  )
-
-(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+  (dolist (face '((org-level-1 . 2.0)
+                    (org-level-2 . 1.8)
+                    (org-level-3 . 1.5)
+                    (org-level-4 . 1.2)
+                    (org-level-5 . 1.1)
+                    (org-level-6 . 1.1)
+                    (org-level-7 . 1.1)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :font "Vollkorn" :weight 'medium :height (cdr face)))
+)
+(add-hook 'org-mode-hook  'org-superstar-mode)
+(add-hook 'org-mode-hook  'mixed-pitch-mode)
 
 (defun org-roam-node-insert-immediate (arg &rest args)
   (interactive "P")
@@ -210,7 +195,7 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t)
 
-(add-hook 'TeX-mode-hook 'lsp-mode)
+(add-hook 'TeX-mode-hook 'mixed-pitch-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
 (add-hook 'TeX-mode-hook
@@ -241,8 +226,6 @@
 (add-hook 'post-command-hook #'my-yas-try-expanding-auto-snippets)
 )
 (add-hook  'TeX-mode-hook 'cdlatex-mode)
-
-(add-hook 'doc-view-mode-hook 'pdf-tools-install)
 
 (citar-org-roam-mode)
 (setq citar-bibliography "~/projects/templates/refs.bib")

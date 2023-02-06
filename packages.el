@@ -62,3 +62,4 @@
 (unpin! lsp-ui)
 (package! lsp-ui)
 (package! afternoon-theme)
+(package! mixed-pitch)
