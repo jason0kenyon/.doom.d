@@ -61,3 +61,4 @@
 (package! lsp-mode)
 (unpin! lsp-ui)
 (package! lsp-ui)
+(package! afternoon-theme)

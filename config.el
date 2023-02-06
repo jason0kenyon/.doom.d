@@ -83,14 +83,14 @@
       display-time-default-load-average nil
       doom-modeline-time t)
   )
-  (setq doom-theme 'doom-tokyo-night)
+  (setq doom-theme 'doom-challenger-deep)
   (setq display-line-numbers-type 'relative)
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
-(setq doom-font (font-spec :family "Hack" :weight 'normal :size 40 ))
-(setq doom-variable-pitch-font (font-spec :family "Inconsolata" :weight 'Medium :size 50 ))
+(setq doom-font (font-spec :family "SpaceMono" :weight 'normal :size 40 ))
+(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :weight 'normal :size 50 ))
 
 (add-hook 'org-mode-hook 'variable-pitch-mode)
 (after! org
@@ -108,7 +108,7 @@
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Inconsolata" :weight 'Medium :height (cdr face)))
+    (set-face-attribute (car face) nil :font "Vollkorn" :weight 'normal :height (cdr face)))
 
   (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
@@ -170,6 +170,7 @@
 (after! org-fancy-priorities
    (setq org-fancy-priorities-list '("⚡" "⚠" "❗")))
 (after! org
+(setq org-clock-sound "~/.doom.d/alarm.wav")
 (setq
   org-agenda-block-separator ?\u25AA
   org-todo-keywords
@@ -232,12 +233,14 @@
 )
 
 (after! yasnippet
+(setq yas-key-syntaxes '("w_" "w_." "w_.()" "^ "))
 (defun my-yas-try-expanding-auto-snippets ()
   (when yas-minor-mode
     (let ((yas-buffer-local-condition ''(require-snippet-condition . auto)))
       (yas-expand))))
 (add-hook 'post-command-hook #'my-yas-try-expanding-auto-snippets)
 )
+(add-hook  'TeX-mode-hook 'cdlatex-mode)
 
 (add-hook 'doc-view-mode-hook 'pdf-tools-install)
 
