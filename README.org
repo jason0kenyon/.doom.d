@@ -88,9 +88,9 @@
       display-time-default-load-average nil
       doom-modeline-time t)
   )
-  (setq doom-theme 'doom-one)
+  (setq doom-theme 'doom-challenger-deep)
   (setq display-line-numbers-type 'relative)
-
+(solaire-global-mode +1)
 #+end_src
 ** Font
 #+begin_src emacs-lisp
@@ -98,46 +98,31 @@
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
 (setq doom-font (font-spec :family "JetBrainsMono" :weight 'normal :size 40 ))
-(setq doom-variable-pitch-font (font-spec :family "Inconsolata" :weight 'Medium :size 50 ))
+(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :weight 'normal :size 50 ))
 #+end_src
 
 * Org Mode
 ** Aesthetic
 Just make things look good.
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook 'variable-pitch-mode)
 (after! org
   (setq org-ellipsis " ▼"
         org-hide-emphasis-markers t
         org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
         org-superstar-item-bullet-alist '((?+ . ?◆) (?- . ?•))
         org-superstar-special-todo-items 'hide)
-
-  (dolist (face '((org-level-1 . 1.5)
-                  (org-level-2 . 1.25)
-                  (org-level-3 . 1.15)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Inconsolata" :weight 'Medium :height (cdr face)))
-
-  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
-
-  )
-
-(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+  (dolist (face '((org-level-1 . 2.0)
+                    (org-level-2 . 1.8)
+                    (org-level-3 . 1.5)
+                    (org-level-4 . 1.2)
+                    (org-level-5 . 1.1)
+                    (org-level-6 . 1.1)
+                    (org-level-7 . 1.1)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :font "Vollkorn" :weight 'medium :height (cdr face)))
+)
+(add-hook 'org-mode-hook  'org-superstar-mode)
+(add-hook 'org-mode-hook  'mixed-pitch-mode)
 #+end_src
 ** Roam
 *** Quick Node Insertion
@@ -193,6 +178,7 @@ My custom agenda view. It displays all current tasks based on priority, a weekly
 (after! org-fancy-priorities
    (setq org-fancy-priorities-list '("⚡" "⚠" "❗")))
 (after! org
+(setq org-clock-sound "~/.doom.d/alarm.wav")
 (setq
   org-agenda-block-separator ?\u25AA
   org-todo-keywords
@@ -243,19 +229,17 @@ A pretty graph of your org-roam notes.
           org-roam-ui-open-on-start t)
 #+end_src
 * Latex
-** Lsp Mode
-Language server.
-#+begin_src emacs-lisp
-(add-hook 'TeX-mode-hook #'lsp-deferred)
-#+end_src
 ** Company Mode
 Autocomplete menu and prettier code.
 #+begin_src emacs-lisp
+(add-hook 'TeX-mode-hook 'mixed-pitch-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
 (add-hook 'TeX-mode-hook
           (lambda ()
-            (push '("\\mathbb{C}" . ?ℂ) prettify-symbols-alist)))
+            (push '("\\mathbb{C}" . ?ℂ) prettify-symbols-alist)
+            (push '("\\mathbb{F}" . ?𝔽) prettify-symbols-alist)
+            ))
 (add-hook 'after-init-hook 'global-company-mode)
 
 (add-hook 'company-mode-hook 'company-box-mode)
@@ -274,17 +258,14 @@ Autocomplete menu and prettier code.
 Automatically activating snippets.
 #+begin_src emacs-lisp
 (after! yasnippet
+(setq yas-key-syntaxes '("w_" "w_." "w_.()" "^ "))
 (defun my-yas-try-expanding-auto-snippets ()
   (when yas-minor-mode
     (let ((yas-buffer-local-condition ''(require-snippet-condition . auto)))
       (yas-expand))))
 (add-hook 'post-command-hook #'my-yas-try-expanding-auto-snippets)
 )
-#+end_src
-** PDF View
-For looking at papers.
-#+begin_src emacs-lisp
-(add-hook 'doc-view-mode-hook 'pdf-tools-install)
+(add-hook  'TeX-mode-hook 'cdlatex-mode)
 #+end_src
 ** Citar
 For organizing your references and your thoughts on them.
@@ -440,3 +421,5 @@ My configuration for synchronizing local email directory with the cloud:
 ** My feed
 Here is my rss feed for scanning Arxiv:
 [[file:elfeed.org][Feed]]
+
+ad

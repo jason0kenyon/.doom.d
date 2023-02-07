@@ -85,6 +85,7 @@
   )
   (setq doom-theme 'doom-challenger-deep)
   (setq display-line-numbers-type 'relative)
+(solaire-global-mode +1)
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
