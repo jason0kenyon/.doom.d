@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: infimum
-# key: inf
-# --
-
-\inf_{${1:domain}} ${2:set} $0

@@ -1,7 +1,0 @@
-# key: thm
-# name: theorem
-# --
-\begin{theorem}
-\label{thm-${1:label}}
-$0
-\end{theorem}

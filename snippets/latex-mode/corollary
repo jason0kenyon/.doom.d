@@ -1,7 +1,0 @@
-# key: cor
-# name: corollary
-# --
-\begin{corollary}
-\label{cor-${1:name}}
-$0
-\end{corollary}

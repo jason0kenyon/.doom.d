@@ -1,4 +1,0 @@
-# key: sup
-# name: supremum
-# --
-\sup_{${1:domain}} ${2:set} $0

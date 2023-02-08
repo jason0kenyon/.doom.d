@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: definition
-# key: def
-# --
-
-\begin{definition}
-\label{def-${1:name}}
-$0
-\end{definition}

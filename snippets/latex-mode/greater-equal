@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: greater-equal
-# key: geq
-# condition: (and (texmathp) 'auto)
-# --
-\geq$0

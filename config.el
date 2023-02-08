@@ -218,16 +218,6 @@
  "C-j" 'company-select-next)
 )
 
-(after! yasnippet
-(setq yas-key-syntaxes '("w_" "w_." "w_.()" "^ "))
-(defun my-yas-try-expanding-auto-snippets ()
-  (when yas-minor-mode
-    (let ((yas-buffer-local-condition ''(require-snippet-condition . auto)))
-      (yas-expand))))
-(add-hook 'post-command-hook #'my-yas-try-expanding-auto-snippets)
-)
-(add-hook  'TeX-mode-hook 'cdlatex-mode)
-
 (citar-org-roam-mode)
 (setq citar-bibliography "~/projects/templates/refs.bib")
 (setq citar-library-paths '("~/library/papers/"))

@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: subscript
-# key: sbs
-# condition: (and (texmathp) 'auto)
-# --
-_{${1:num}}$0

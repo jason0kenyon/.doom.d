@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: math-mode
-# key: mk
-# condition: 'auto
-# --
-$$0$

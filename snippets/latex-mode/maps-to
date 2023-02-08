@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: maps-to
-# key: -->
-# condition: (and (texmathp) 'auto)
-# --
-\mapsto$0
