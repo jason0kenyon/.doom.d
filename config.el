@@ -196,6 +196,7 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t)
 
+(add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'TeX-mode-hook 'mixed-pitch-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 

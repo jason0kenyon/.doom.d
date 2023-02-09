@@ -232,6 +232,7 @@ A pretty graph of your org-roam notes.
 ** Company Mode
 Autocomplete menu and prettier code.
 #+begin_src emacs-lisp
+(add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'TeX-mode-hook 'mixed-pitch-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
