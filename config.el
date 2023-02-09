@@ -196,6 +196,27 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t)
 
+(add-hook 'TeX-mode-hook 'smartparens-mode)
+(add-hook 'TeX-mode-hook 'laas-mode)
+(after! laas
+(aas-set-snippets 'laas-mode
+                    ;; set condition!
+                    :cond #'texmathp ; expand only while in math
+                    "supp" "\\supp"
+                    "On" "O(n)"
+                    "O1" "O(1)"
+                    "Olog" "O(\\log n)"
+                    "Olon" "O(n \\log n)"
+                    ;; bind to functions!
+                    "Sum" (lambda () (interactive)
+                            (yas-expand-snippet "\\sum_{$1}^{$2} $0"))
+                    "Span" (lambda () (interactive)
+                             (yas-expand-snippet "\\Span($1)$0"))
+                    ;; add accent snippets
+                    :cond #'laas-object-on-left-condition
+                    "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt")))
+                )
+
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'TeX-mode-hook 'mixed-pitch-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)

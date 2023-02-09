@@ -53,6 +53,11 @@
 (package! org-roam-ui)
 (package! websocket)
 (package! company-box)
+
 (package! mu4e-alert :disable t)
+
 (package! mixed-pitch)
+(package! doom-snippets :ignore t)
 (package! cdlatex)
+(package! aas)
+(package! laas)
