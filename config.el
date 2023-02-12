@@ -126,9 +126,9 @@
       :desc "Org babel tangle" "m B" #'org-babel-tangle)
 
 (after! org
-(setq org-directory "~/projects/org/"
-      org-agenda-files '("~/projects/org/org-roam")
-      org-roam-directory "~/projects/org/org-roam")
+(setq org-directory "~/projects/org-roam/"
+      org-agenda-files '("~/projects/org-roam")
+      org-roam-directory "~/projects/org-roam")
 
  (setq org-roam-capture-templates
               '(("t" "default" plain
@@ -196,6 +196,7 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t)
 
+(add-hook 'pdf-view-mode-hook 'global-auto-revert-mode)
 (add-hook 'TeX-mode-hook 'smartparens-mode)
 (add-hook 'TeX-mode-hook 'laas-mode)
 (after! laas
@@ -215,7 +216,14 @@
                     ;; add accent snippets
                     :cond #'laas-object-on-left-condition
                     "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt")))
-                )
+
+(aas-set-snippets 'laas-mode
+
+"math-mode" (lambda () (interactive)
+       (yas-expand-snippet "$$0$")))
+
+
+)
 
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'TeX-mode-hook 'mixed-pitch-mode)
@@ -241,7 +249,7 @@
 )
 
 (citar-org-roam-mode)
-(setq citar-bibliography "~/projects/templates/refs.bib")
+(setq citar-bibliography "~/projects/writing/templates/refs.bib")
 (setq citar-library-paths '("~/library/papers/"))
 (setq citar-symbols
       `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
