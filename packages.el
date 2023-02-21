@@ -53,11 +53,12 @@
 (package! org-roam-ui)
 (package! websocket)
 (package! company-box)
-
+(package! counsel)
 (package! mu4e-alert :disable t)
-
+(package! smart-mode-line)
 (package! mixed-pitch)
 (package! doom-snippets :ignore t)
 (package! cdlatex)
 (package! aas)
 (package! laas)
+(package! exwm)

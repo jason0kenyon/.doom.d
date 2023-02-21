@@ -72,26 +72,37 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(setq display-time-default-load-average nil)
-(add-hook 'after-init-hook 'display-time-mode)
+;;(setq display-time-default-load-average nil)
+;;(setq display-time-day-and-date t)
+;;(add-hook 'after-init-hook 'display-time-mode)
+;;(after! doom-modeline
+;;  ;; Show battery status in the mode line
+;;  (display-battery-mode 1)
+;;  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)
+;;  (line-number-mode -1)
+;;  (setq
+;;      doom-modeline-height 20
+;;      display-time-default-load-average nil
+;;      doom-modeline-time t)
+;;  )
+
+(remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
 (after! doom-modeline
-  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
-  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)
-  (line-number-mode -1)
-  (setq
-      doom-modeline-height 40
-      display-time-default-load-average nil
-      doom-modeline-time t)
-  )
-  (setq doom-theme 'doom-challenger-deep)
+;; How tall the mode-line should be. It's only respected in GUI.
+;; If the actual char height is larger, it respects the actual height.
+(setq doom-modeline-height 25)
+(setq doom-modeline-workspace-name nil)
+
+                )
+  (setq doom-theme 'doom-snazzy)
   (setq display-line-numbers-type 'relative)
-(solaire-global-mode +1)
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
-(setq doom-font (font-spec :family "JetBrainsMono" :weight 'normal :size 40 ))
-(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :weight 'normal :size 50 ))
+(setq doom-font (font-spec :family "AnonymousPro" :weight 'normal :size 50 ))
+(setq doom-variable-pitch-font (font-spec :family "Signika" :weight 'normal :size 60 ))
+(setq doom-unicode-font (font-spec :family "Symbola"))
 
 (after! org
   (setq org-ellipsis " ▼"
@@ -107,7 +118,7 @@
                     (org-level-6 . 1.1)
                     (org-level-7 . 1.1)
                     (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Vollkorn" :weight 'medium :height (cdr face)))
+      (set-face-attribute (car face) nil :font "Signika" :weight 'medium :height (cdr face)))
 )
 (add-hook 'org-mode-hook  'org-superstar-mode)
 (add-hook 'org-mode-hook  'mixed-pitch-mode)
@@ -247,6 +258,8 @@
  "C-k"  'company-select-previous
  "C-j" 'company-select-next)
 )
+(after! lsp
+  )
 
 (citar-org-roam-mode)
 (setq citar-bibliography "~/projects/writing/templates/refs.bib")
@@ -379,3 +392,126 @@ orgtbl syntax."
   (mu4e-mark-execute-all t))
 
 (setq rmh-elfeed-org-files '("~/.doom.d/elfeed.org"))
+
+(defun make-external-command (command)
+  (lambda ()
+    (interactive)
+    (let ((buffer-name (car (split-string command))))
+      (cond
+       ((equal buffer-name (buffer-name))
+        (switch-to-last-used-buffer))
+       ((get-buffer buffer-name)
+        (switch-to-buffer (get-buffer buffer-name)))
+       (t (start-process-shell-command buffer-name nil command))))))
+
+(defmacro bind-exwm-keys (&rest keybindings)
+  `(mapc (cl-function
+          (lambda ((keybinding . command))
+            (exwm-input-set-key (kbd keybinding)
+                                (if (stringp command)
+                                    (make-external-command command)
+                                  command))))
+         ',keybindings))
+(bind-exwm-keys
+("<XF86AudioMute>" . "amixer set Master toggle")
+("<XF86AudioLowerVolume>" . "amixer set Master 10%-")
+("<XF86AudioRaiseVolume>" . "amixer set Master 10%+")
+("<XF86MonBrightnessUp>" . "brightnessctl set 10%+")
+("<XF86MonBrightnessDown>" . "brightnessctl set 10%-"))
+(setq exwm-workspace-number 5)
+(setq exwm-input-prefix-keys
+      '(?\M-x))
+ (setq exwm-input-global-keys
+        `(
+          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+          ([?\s-r] . exwm-reset)
+
+          ;; Move between windows
+          ([?\s-h] . windmove-left)
+          ([?\s-l] . windmove-right)
+          ([?\s-k] . windmove-up)
+          ([?\s-j] . windmove-down)
+          ([?\s-q] . exwm-workspace-delete)
+          ([?\s-s] . evil-window-vsplit)
+          ([?\s-v] . evil-window-split)
+          ([?\s-p] . exwm-workspace-switch)
+          ([?\s-w] . evil-window-delete)
+          ([?\s-J] . +evil/window-move-down)
+          ([?\s-K] . +evil/window-move-up)
+          ([?\s-H] . +evil/window-move-left)
+          ([?\s-L] . +evil/window-move-right)
+
+
+          ;; Switch workspace
+          ;;          ([?\s-w] . exwm-workspace-switch)
+
+          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" i)) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))))
+(require 'exwm-randr)
+(exwm-randr-enable)
+(start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --primary --mode 3456x2160 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --off --output DP-3 --off")
+
+;; Load the system tray before exwm-init
+;;(require 'exwm-systemtray)
+;;(exwm-systemtray-enable)
+(defun efs/exwm-update-class ()
+  (exwm-workspace-rename-buffer exwm-class-name))
+(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(defun efs/exwm-init-hook ()
+  ;; Make workspace 1 be the one where we land at startup
+  (exwm-workspace-switch-create 1)
+
+  ;; Open eshell by default
+  ;;(eshell)
+ ;; Start the Polybar panel
+  (efs/start-panel)
+
+  ;; Show the time and date in modeline
+  ;; Also take a look at display-time-format and format-time-string
+
+  ;; Launch apps that will run in the background
+ ;; (efs/run-in-background "nm-applet")
+ ;; (efs/run-in-background "pasystray")
+ ;; (efs/run-in-background "blueman-applet")
+  )
+;; When EXWM starts up, do some extra confifuration
+(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+(exwm-input-set-key (kbd "s-x") 'counsel-linux-app)
+(exwm-enable)
+
+(map! :leader :desc "switch buffer" :n "," #'ivy-switch-buffer)
+;; Make sure the server is started (better to do this in your main Emacs config!)
+(server-start)
+
+(defvar efs/polybar-process nil
+  "Holds the process of the running Polybar instance, if any")
+
+(defun efs/kill-panel ()
+  (interactive)
+  (when efs/polybar-process
+    (ignore-errors
+      (kill-process efs/polybar-process)))
+  (setq efs/polybar-process nil))
+
+(defun efs/start-panel ()
+  (interactive)
+  (efs/kill-panel)
+  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+
+(defun efs/send-polybar-hook (module-name hook-index)
+  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+
+(defun efs/send-polybar-exwm-workspace ()
+  (efs/send-polybar-hook "exwm-workspace" 1))
+
+;; Update panel indicator when workspace changes
+(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
