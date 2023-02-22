@@ -55,7 +55,6 @@
 (package! company-box)
 (package! counsel)
 (package! mu4e-alert :disable t)
-(package! smart-mode-line)
 (package! mixed-pitch)
 (package! cdlatex)
 (package! aas)

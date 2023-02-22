@@ -81,7 +81,7 @@
 (after! doom-modeline
 (setq doom-modeline-height 25))
 (setq display-line-numbers-type 'relative)
-(setq doom-theme 'doom-snazzy)
+(setq doom-theme 'doom-oceanic-next)
 #+end_src
 ** Font
 #+begin_src emacs-lisp
@@ -275,7 +275,7 @@ Autocomplete menu and prettier code.
 (add-hook 'company-mode-hook 'company-box-mode)
 (after! company
 (setq
-  company-minimum-prefix-length 0
+  company-minimum-prefix-length 3
   company-idle-delay 0.5)
 (map!
  :map 'company-active-map
@@ -485,7 +485,8 @@ super+x for non-emacs commands, analgous to meta+x. Launch any app.
 ("<XF86AudioLowerVolume>" . "amixer set Master 10%-")
 ("<XF86AudioRaiseVolume>" . "amixer set Master 10%+")
 ("<XF86MonBrightnessUp>" . "brightnessctl set 10%+")
-("<XF86MonBrightnessDown>" . "brightnessctl set 10%-"))
+("<XF86MonBrightnessDown>" . "brightnessctl set 10%-")
+("s-b" . "qutebrowser"))
 (exwm-input-set-key (kbd "s-x") 'counsel-linux-app)
 #+end_src
 ** PolyBar
@@ -510,6 +511,13 @@ Check out the config for the [[file:config.ini][polybar]]
   (efs/kill-panel)
   (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
 
+(defun efs/polybar-exwm-workspace ()
+  (pcase exwm-workspace-current-index
+    (0 "")
+    (1 "")
+    (2 "")
+    (3 "")
+    (4 "")))
 (defun efs/send-polybar-hook (module-name hook-index)
   (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
 
@@ -525,6 +533,9 @@ Check out the config for the [[file:config.ini][polybar]]
 (exwm-randr-enable)
 (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --primary --mode 3456x2160 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --off --output DP-3 --off")
 (defun efs/exwm-init-hook ()
+  (efs/run-in-background "nm-applet")
+  (efs/run-in-background "blueman-applet")
+  (efs/run-in-background "pasystray")
   ;; Make workspace 1 be the one where we land at startup
   (exwm-workspace-switch-create 1)
  ;; Start the Polybar panel
