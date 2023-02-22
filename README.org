@@ -77,28 +77,20 @@
 * Appearance
 ** Theme
 #+begin_src emacs-lisp
-(setq display-time-default-load-average nil)
-(add-hook 'after-init-hook 'display-time-mode)
+(remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
 (after! doom-modeline
-  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
-  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)
-  (line-number-mode -1)
-  (setq
-      doom-modeline-height 40
-      display-time-default-load-average nil
-      doom-modeline-time t)
-  )
-  (setq doom-theme 'doom-challenger-deep)
-  (setq display-line-numbers-type 'relative)
-(solaire-global-mode +1)
+(setq doom-modeline-height 25))
+(setq display-line-numbers-type 'relative)
+(setq doom-theme 'doom-snazzy)
 #+end_src
 ** Font
 #+begin_src emacs-lisp
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
-(setq doom-font (font-spec :family "JetBrainsMono" :weight 'normal :size 40 ))
-(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :weight 'normal :size 50 ))
+(setq doom-font (font-spec :family "AnonymousPro" :weight 'normal :size 50 ))
+(setq doom-variable-pitch-font (font-spec :family "Signika" :weight 'normal :size 60 ))
+(setq doom-unicode-font (font-spec :family "Symbola"))
 #+end_src
 
 * Org Mode
@@ -119,10 +111,9 @@ Just make things look good.
                     (org-level-6 . 1.1)
                     (org-level-7 . 1.1)
                     (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Vollkorn" :weight 'medium :height (cdr face)))
-)
+      (set-face-attribute (car face) nil :font "Signika" :weight 'medium :height (cdr face))))
 (add-hook 'org-mode-hook  'org-superstar-mode)
-(add-hook 'org-mode-hook  'mixed-pitch-mode)
+(add-hook 'org-mode-hook 'mixed-pitch-mode)
 #+end_src
 ** Roam
 *** Quick Node Insertion
@@ -145,9 +136,9 @@ This function allows you to insert a node in a document that may not yet exist, 
 Set org, org-agenda and org-roam directories. My three roam templates for each day and week, along with a template for setting and achieving goals.
 #+begin_src emacs-lisp
 (after! org
-(setq org-directory "~/projects/org/"
-      org-agenda-files '("~/projects/org/org-roam")
-      org-roam-directory "~/projects/org/org-roam")
+(setq org-directory "~/projects/org-roam/"
+      org-agenda-files '("~/projects/org-roam")
+      org-roam-directory "~/projects/org-roam")
 
  (setq org-roam-capture-templates
               '(("t" "default" plain
@@ -169,8 +160,24 @@ Set org, org-agenda and org-roam directories. My three roam templates for each d
                  "* Priority III\n\n* Statement\n\n%?\n\n* Action Plan\n** Maintenance\n** Overview\n\n* Week\n** One\n*** TODO\n*** Commments & Meta-cognition\n\n* Deadlines"
                  :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Aim\n#+category: Aim")
                  :unnarrowed t)
-                ))
- )
+                )))
+#+end_src
+** Citar
+For organizing your references and your thoughts on them.
+#+begin_src emacs-lisp
+(citar-org-roam-mode)
+(setq citar-bibliography "~/projects/writing/templates/refs.bib")
+(setq citar-library-paths '("~/library/papers/"))
+(setq citar-templates
+      '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
+        (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+        (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+        (note . "Notes on ${author editor}, ${title}")))
+(setq citar-symbols
+      `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . "📁")
+        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . "🖋️")
+        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . "🔗")))
+(setq citar-symbol-separator "  ")
 #+end_src
 ** Agenda
 My custom agenda view. It displays all current tasks based on priority, a weekly agenda, and the list of all tasks put on hold.
@@ -212,13 +219,6 @@ My custom agenda view. It displays all current tasks based on priority, a weekly
         )
 )
 )
-
-
-
-
-
-
-
 #+end_src
 ** UI Mode
 A pretty graph of your org-roam notes.
@@ -229,9 +229,40 @@ A pretty graph of your org-roam notes.
           org-roam-ui-open-on-start t)
 #+end_src
 * Latex
+** Snippets
+#+begin_src emacs-lisp
+(add-hook 'pdf-view-mode-hook 'global-auto-revert-mode)
+(add-hook 'TeX-mode-hook 'smartparens-mode)
+(add-hook 'TeX-mode-hook 'laas-mode)
+(after! laas
+(aas-set-snippets 'laas-mode
+                    ;; set condition!
+                    :cond #'texmathp ; expand only while in math
+                    "supp" "\\supp"
+                    "On" "O(n)"
+                    "O1" "O(1)"
+                    "Olog" "O(\\log n)"
+                    "Olon" "O(n \\log n)"
+                    ;; bind to functions!
+                    "Sum" (lambda () (interactive)
+                            (yas-expand-snippet "\\sum_{$1}^{$2} $0"))
+                    "Span" (lambda () (interactive)
+                             (yas-expand-snippet "\\Span($1)$0"))
+                    ;; add accent snippets
+                    :cond #'laas-object-on-left-condition
+                    "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt")))
+
+(aas-set-snippets 'laas-mode
+"mk" (lambda () (interactive)
+       (yas-expand-snippet "$$0$")))
+)
+
+
+#+end_src
 ** Company Mode
 Autocomplete menu and prettier code.
 #+begin_src emacs-lisp
+(add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 (add-hook 'TeX-mode-hook 'mixed-pitch-mode)
 (add-hook 'TeX-mode-hook 'prettify-symbols-mode)
 
@@ -241,43 +272,16 @@ Autocomplete menu and prettier code.
             (push '("\\mathbb{F}" . ?𝔽) prettify-symbols-alist)
             ))
 (add-hook 'after-init-hook 'global-company-mode)
-
 (add-hook 'company-mode-hook 'company-box-mode)
 (after! company
 (setq
-  company-minimum-prefix-length 3
+  company-minimum-prefix-length 0
   company-idle-delay 0.5)
 (map!
  :map 'company-active-map
  "<tab>" 'company-complete-selection
  "C-k"  'company-select-previous
- "C-j" 'company-select-next)
-)
-#+end_src
-** Snippets
-Automatically activating snippets.
-#+begin_src emacs-lisp
-(after! yasnippet
-(setq yas-key-syntaxes '("w_" "w_." "w_.()" "^ "))
-(defun my-yas-try-expanding-auto-snippets ()
-  (when yas-minor-mode
-    (let ((yas-buffer-local-condition ''(require-snippet-condition . auto)))
-      (yas-expand))))
-(add-hook 'post-command-hook #'my-yas-try-expanding-auto-snippets)
-)
-(add-hook  'TeX-mode-hook 'cdlatex-mode)
-#+end_src
-** Citar
-For organizing your references and your thoughts on them.
-#+begin_src emacs-lisp
-(citar-org-roam-mode)
-(setq citar-bibliography "~/projects/templates/refs.bib")
-(setq citar-library-paths '("~/library/papers/"))
-(setq citar-symbols
-      `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . "🖋️")
-        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
-(setq citar-symbol-separator "  ")
+ "C-j" 'company-select-next))
 #+end_src
 ** Matrices
 For typing matrices much more quickly in latex. (It's even faster than writing them on paper.)
@@ -367,6 +371,7 @@ orgtbl syntax."
 ** Config
 Making my two email accounts accessible within emacs.
 #+begin_src emacs-lisp
+(map! :leader :desc "copy password" "op" #'+pass/consult)
 (add-hook 'mu4e-compose-mode-hook 'turn-off-auto-fill)
 (set-email-account! "binghamton"
   '((mu4e-sent-folder       . "/jkenyon3/[Gmail]/Sent Mail")
@@ -393,33 +398,139 @@ Making my two email accounts accessible within emacs.
           ("/jkenyon3/[Gmail]/Sent Mail" . ?S)))
 )
 #+end_src
-** Miscellaneous Functions
-For when you don't want to read your emails.
-#+begin_src emacs-lisp
-(defun mu4e-headers-mark-all-unread-read ()
-  "Put a ! \(read) mark on all visible unread messages."
-  (interactive)
-  (mu4e-headers-mark-for-each-if
-   (cons 'read nil)
-   (lambda (msg param)
-     (memq 'unread (mu4e-msg-field msg :flags)))))
-
-(defun mu4e-headers-flag-all-read ()
-  "Flag all visible messages as \"read\"."
-  (interactive)
-  (mu4e-headers-mark-all-unread-read)
-  (mu4e-mark-execute-all t))
-#+end_src
 ** Mbsync
 My configuration for synchronizing local email directory with the cloud:
 [[file:.mbsyncrc][Local]]
 * Elfeed
-** Setting Location
-#+begin_src emacs-lisp
-(setq rmh-elfeed-org-files '("~/.doom.d/elfeed.org"))
-#+end_src
 ** My feed
 Here is my rss feed for scanning Arxiv:
 [[file:elfeed.org][Feed]]
+#+begin_src emacs-lisp
+(setq rmh-elfeed-org-files '("~/.doom.d/elfeed.org"))
+#+end_src
+* Exwm
+** Helper Functions
+#+begin_src emacs-lisp
+(defun make-external-command (command)
+  (lambda ()
+    (interactive)
+    (let ((buffer-name (car (split-string command))))
+      (cond
+       ((equal buffer-name (buffer-name))
+        (switch-to-last-used-buffer))
+       ((get-buffer buffer-name)
+        (switch-to-buffer (get-buffer buffer-name)))
+       (t (start-process-shell-command buffer-name nil command))))))
 
-ad
+(defmacro bind-exwm-keys (&rest keybindings)
+  `(mapc (cl-function
+          (lambda ((keybinding . command))
+            (exwm-input-set-key (kbd keybinding)
+                                (if (stringp command)
+                                    (make-external-command command)
+                                  command))))
+         ',keybindings))
+(setq exwm-input-prefix-keys
+      '(?\M-x))
+
+(defun efs/exwm-update-class ()
+  (exwm-workspace-rename-buffer exwm-class-name))
+(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+#+end_src
+** Movement
+Standard vim-like window navigation, and workspace bindings.
+#+begin_src emacs-lisp
+(setq exwm-workspace-number 5)
+ (setq exwm-input-global-keys
+        `(
+          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+          ([?\s-r] . exwm-reset)
+
+          ;; Move between windows
+          ([?\s-h] . windmove-left)
+          ([?\s-l] . windmove-right)
+          ([?\s-k] . windmove-up)
+          ([?\s-j] . windmove-down)
+          ([?\s-q] . exwm-workspace-delete)
+          ([?\s-s] . evil-window-vsplit)
+          ([?\s-v] . evil-window-split)
+          ([?\s-p] . exwm-workspace-switch)
+          ([?\s-w] . evil-window-delete)
+          ([?\s-J] . +evil/window-move-down)
+          ([?\s-K] . +evil/window-move-up)
+          ([?\s-H] . +evil/window-move-left)
+          ([?\s-L] . +evil/window-move-right)
+
+
+          ;; Switch workspace
+          ;;          ([?\s-w] . exwm-workspace-switch)
+
+          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" i)) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))))
+
+#+end_src
+** Media Keys
+super+x for non-emacs commands, analgous to meta+x. Launch any app.
+#+begin_src emacs-lisp
+(bind-exwm-keys
+("<XF86AudioMute>" . "amixer set Master toggle")
+("<XF86AudioLowerVolume>" . "amixer set Master 10%-")
+("<XF86AudioRaiseVolume>" . "amixer set Master 10%+")
+("<XF86MonBrightnessUp>" . "brightnessctl set 10%+")
+("<XF86MonBrightnessDown>" . "brightnessctl set 10%-"))
+(exwm-input-set-key (kbd "s-x") 'counsel-linux-app)
+#+end_src
+** PolyBar
+Check out the config for the [[file:config.ini][polybar]]
+#+begin_src emacs-lisp
+(map! :leader :desc "switch buffer" :n "," #'ivy-switch-buffer)
+;; Make sure the server is started (better to do this in your main Emacs config!)
+(server-start)
+
+(defvar efs/polybar-process nil
+  "Holds the process of the running Polybar instance, if any")
+
+(defun efs/kill-panel ()
+  (interactive)
+  (when efs/polybar-process
+    (ignore-errors
+      (kill-process efs/polybar-process)))
+  (setq efs/polybar-process nil))
+
+(defun efs/start-panel ()
+  (interactive)
+  (efs/kill-panel)
+  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+
+(defun efs/send-polybar-hook (module-name hook-index)
+  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+
+(defun efs/send-polybar-exwm-workspace ()
+  (efs/send-polybar-hook "exwm-workspace" 1))
+
+;; Update panel indicator when workspace changes
+(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+#+end_src
+** Init Hook
+#+begin_src emacs-lisp
+(require 'exwm-randr)
+(exwm-randr-enable)
+(start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --primary --mode 3456x2160 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --off --output DP-3 --off")
+(defun efs/exwm-init-hook ()
+  ;; Make workspace 1 be the one where we land at startup
+  (exwm-workspace-switch-create 1)
+ ;; Start the Polybar panel
+  (efs/start-panel)
+  )
+;; When EXWM starts up, do some extra confifuration
+(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+(exwm-enable)
+#+end_src

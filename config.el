@@ -72,30 +72,11 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;;(setq display-time-default-load-average nil)
-;;(setq display-time-day-and-date t)
-;;(add-hook 'after-init-hook 'display-time-mode)
-;;(after! doom-modeline
-;;  ;; Show battery status in the mode line
-;;  (display-battery-mode 1)
-;;  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)
-;;  (line-number-mode -1)
-;;  (setq
-;;      doom-modeline-height 20
-;;      display-time-default-load-average nil
-;;      doom-modeline-time t)
-;;  )
-
 (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
 (after! doom-modeline
-;; How tall the mode-line should be. It's only respected in GUI.
-;; If the actual char height is larger, it respects the actual height.
-(setq doom-modeline-height 25)
-(setq doom-modeline-workspace-name nil)
-
-                )
-  (setq doom-theme 'doom-snazzy)
-  (setq display-line-numbers-type 'relative)
+(setq doom-modeline-height 25))
+(setq display-line-numbers-type 'relative)
+(setq doom-theme 'doom-snazzy)
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
@@ -118,10 +99,9 @@
                     (org-level-6 . 1.1)
                     (org-level-7 . 1.1)
                     (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Signika" :weight 'medium :height (cdr face)))
-)
+      (set-face-attribute (car face) nil :font "Signika" :weight 'medium :height (cdr face))))
 (add-hook 'org-mode-hook  'org-superstar-mode)
-(add-hook 'org-mode-hook  'mixed-pitch-mode)
+(add-hook 'org-mode-hook 'mixed-pitch-mode)
 
 (defun org-roam-node-insert-immediate (arg &rest args)
   (interactive "P")
@@ -161,8 +141,21 @@
                  "* Priority III\n\n* Statement\n\n%?\n\n* Action Plan\n** Maintenance\n** Overview\n\n* Week\n** One\n*** TODO\n*** Commments & Meta-cognition\n\n* Deadlines"
                  :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Aim\n#+category: Aim")
                  :unnarrowed t)
-                ))
- )
+                )))
+
+(citar-org-roam-mode)
+(setq citar-bibliography "~/projects/writing/templates/refs.bib")
+(setq citar-library-paths '("~/library/papers/"))
+(setq citar-templates
+      '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
+        (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+        (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+        (note . "Notes on ${author editor}, ${title}")))
+(setq citar-symbols
+      `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . "📁")
+        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . "🖋️")
+        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . "🔗")))
+(setq citar-symbol-separator "  ")
 
 (after! org-fancy-priorities
    (setq org-fancy-priorities-list '("⚡" "⚠" "❗")))
@@ -229,11 +222,8 @@
                     "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt")))
 
 (aas-set-snippets 'laas-mode
-
-"math-mode" (lambda () (interactive)
+"mk" (lambda () (interactive)
        (yas-expand-snippet "$$0$")))
-
-
 )
 
 (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
@@ -246,29 +236,16 @@
             (push '("\\mathbb{F}" . ?𝔽) prettify-symbols-alist)
             ))
 (add-hook 'after-init-hook 'global-company-mode)
-
 (add-hook 'company-mode-hook 'company-box-mode)
 (after! company
 (setq
-  company-minimum-prefix-length 3
+  company-minimum-prefix-length 0
   company-idle-delay 0.5)
 (map!
  :map 'company-active-map
  "<tab>" 'company-complete-selection
  "C-k"  'company-select-previous
- "C-j" 'company-select-next)
-)
-(after! lsp
-  )
-
-(citar-org-roam-mode)
-(setq citar-bibliography "~/projects/writing/templates/refs.bib")
-(setq citar-library-paths '("~/library/papers/"))
-(setq citar-symbols
-      `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . "🖋️")
-        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " ")))
-(setq citar-symbol-separator "  ")
+ "C-j" 'company-select-next))
 
 (require 'cdlatex)
 (require 'org-table)
@@ -351,6 +328,7 @@ orgtbl syntax."
       :desc "Convert table to matrix" "l" #'lazytab-orgtbl-replace)
 (add-hook 'TeX-mode-hook 'orgtbl-mode)
 
+(map! :leader :desc "copy password" "op" #'+pass/consult)
 (add-hook 'mu4e-compose-mode-hook 'turn-off-auto-fill)
 (set-email-account! "binghamton"
   '((mu4e-sent-folder       . "/jkenyon3/[Gmail]/Sent Mail")
@@ -377,20 +355,6 @@ orgtbl syntax."
           ("/jkenyon3/[Gmail]/Sent Mail" . ?S)))
 )
 
-(defun mu4e-headers-mark-all-unread-read ()
-  "Put a ! \(read) mark on all visible unread messages."
-  (interactive)
-  (mu4e-headers-mark-for-each-if
-   (cons 'read nil)
-   (lambda (msg param)
-     (memq 'unread (mu4e-msg-field msg :flags)))))
-
-(defun mu4e-headers-flag-all-read ()
-  "Flag all visible messages as \"read\"."
-  (interactive)
-  (mu4e-headers-mark-all-unread-read)
-  (mu4e-mark-execute-all t))
-
 (setq rmh-elfeed-org-files '("~/.doom.d/elfeed.org"))
 
 (defun make-external-command (command)
@@ -412,15 +376,17 @@ orgtbl syntax."
                                     (make-external-command command)
                                   command))))
          ',keybindings))
-(bind-exwm-keys
-("<XF86AudioMute>" . "amixer set Master toggle")
-("<XF86AudioLowerVolume>" . "amixer set Master 10%-")
-("<XF86AudioRaiseVolume>" . "amixer set Master 10%+")
-("<XF86MonBrightnessUp>" . "brightnessctl set 10%+")
-("<XF86MonBrightnessDown>" . "brightnessctl set 10%-"))
-(setq exwm-workspace-number 5)
 (setq exwm-input-prefix-keys
       '(?\M-x))
+
+(defun efs/exwm-update-class ()
+  (exwm-workspace-rename-buffer exwm-class-name))
+(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(setq exwm-workspace-number 5)
  (setq exwm-input-global-keys
         `(
           ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
@@ -452,41 +418,14 @@ orgtbl syntax."
                           (interactive)
                           (exwm-workspace-switch-create ,i))))
                     (number-sequence 0 9))))
-(require 'exwm-randr)
-(exwm-randr-enable)
-(start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --primary --mode 3456x2160 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --off --output DP-3 --off")
 
-;; Load the system tray before exwm-init
-;;(require 'exwm-systemtray)
-;;(exwm-systemtray-enable)
-(defun efs/exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
-
-  ;; Open eshell by default
-  ;;(eshell)
- ;; Start the Polybar panel
-  (efs/start-panel)
-
-  ;; Show the time and date in modeline
-  ;; Also take a look at display-time-format and format-time-string
-
-  ;; Launch apps that will run in the background
- ;; (efs/run-in-background "nm-applet")
- ;; (efs/run-in-background "pasystray")
- ;; (efs/run-in-background "blueman-applet")
-  )
-;; When EXWM starts up, do some extra confifuration
-(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+(bind-exwm-keys
+("<XF86AudioMute>" . "amixer set Master toggle")
+("<XF86AudioLowerVolume>" . "amixer set Master 10%-")
+("<XF86AudioRaiseVolume>" . "amixer set Master 10%+")
+("<XF86MonBrightnessUp>" . "brightnessctl set 10%+")
+("<XF86MonBrightnessDown>" . "brightnessctl set 10%-"))
 (exwm-input-set-key (kbd "s-x") 'counsel-linux-app)
-(exwm-enable)
 
 (map! :leader :desc "switch buffer" :n "," #'ivy-switch-buffer)
 ;; Make sure the server is started (better to do this in your main Emacs config!)
@@ -515,3 +454,16 @@ orgtbl syntax."
 
 ;; Update panel indicator when workspace changes
 (add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+
+(require 'exwm-randr)
+(exwm-randr-enable)
+(start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --primary --mode 3456x2160 --pos 0x0 --rotate normal --output DP-1 --off --output DP-2 --off --output DP-3 --off")
+(defun efs/exwm-init-hook ()
+  ;; Make workspace 1 be the one where we land at startup
+  (exwm-workspace-switch-create 1)
+ ;; Start the Polybar panel
+  (efs/start-panel)
+  )
+;; When EXWM starts up, do some extra confifuration
+(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+(exwm-enable)

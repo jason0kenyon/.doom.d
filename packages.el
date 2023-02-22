@@ -57,7 +57,6 @@
 (package! mu4e-alert :disable t)
 (package! smart-mode-line)
 (package! mixed-pitch)
-(package! doom-snippets :ignore t)
 (package! cdlatex)
 (package! aas)
 (package! laas)
